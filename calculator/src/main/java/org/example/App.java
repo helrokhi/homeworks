@@ -13,39 +13,52 @@ public class App {
     public final static String OPERATION_REGEX = "[-+/*]";
 
     public static void main(String[] args) {
+        Scanner scanner = null;
+        System.out.println("Консольное приложение «Калькулятор». Для выхода наберите «exit»");
         try {
+            scanner = new Scanner(System.in);
             while (true) {
-                String input = createInput();
-                System.out.println("Output: " + calc(input));
+                String input = createInput(scanner);
+                if (input.equals("exit")) break;
+                System.out.println("Output: " + resultOfArithmeticOperation(input));
             }
         } catch (InvalidFormatException exception) {
             System.out.println(exception.getMessage());
+        } finally {
+            if (scanner != null) scanner.close();
         }
     }
 
-    public static String calc(String input) throws InvalidFormatException {
+    public static int resultOfArithmeticOperation(String input) throws InvalidFormatException {
         String[] words = input.split(OPERATION_REGEX);
 
-        if (words.length == 0 || words.length == 1) {
+        if (isValidOperation(words)) {
             throw new InvalidFormatException("Строка не является математической операцией.");
         }
 
-        if (words.length > 2) {
+        if (isValidFormatOperation(words)) {
             throw new InvalidFormatException("Формат математической операции не удовлетворяет заданию -" +
                     "два операнда и один оператор (+, -, /, *)");
         }
 
-        int a = Integer.parseInt(words[0]);
-        int b = Integer.parseInt(words[1]);
+        int a;
+        int b;
+        try {
+            a = Integer.parseInt(words[0].replaceAll(" ", ""));
+            b = Integer.parseInt(words[1].replaceAll(" ", ""));
+        } catch (NumberFormatException exception) {
+            throw new InvalidFormatException("Не удалось получить числа для арифметической операции.");
+        }
+
         int index = getIndexOperationInInput(input);
         char operation = input.charAt(index);
 
-        if (a < 1 || b < 1 || a > 10 || b > 10) {
+        if (!isValidFormatNumbers(a, b)) {
             throw new InvalidFormatException("На вход переданы числа, " +
                     "с которыми не работает калькулятор");
         }
 
-        return String.valueOf(calculator(a, b, operation));
+        return calculator(a, b, operation);
     }
 
     /**
@@ -53,8 +66,7 @@ public class App {
      *
      * @return строка сданными из консоли
      */
-    private static String createInput() {
-        Scanner scanner = new Scanner(System.in);
+    private static String createInput(Scanner scanner) {
         System.out.println("Input: ");
         return scanner.nextLine().trim();
     }
@@ -92,5 +104,37 @@ public class App {
             index = matcher.start();
         }
         return index;
+    }
+
+    /**
+     * Проверка, является ли строка математической операцией
+     *
+     * @param words массив слов
+     * @return true, если строка - нематематическая операция
+     */
+    private static boolean isValidOperation(String[] words) {
+        return words.length == 0 || words.length == 1;
+    }
+
+    /**
+     * Проверить удовлетворяет ли заданию формат математической операции
+     *
+     * @param words массив слов
+     * @return true, если формат математической операции не удовлетворяет заданию
+     */
+    private static boolean isValidFormatOperation(String[] words) {
+        return words.length > 2;
+    }
+
+    /**
+     * Проверить переданные на вход числа, удовлетворяют ли они, формату чисел,
+     * с которыми не работает калькулятор
+     *
+     * @param a первое число
+     * @param b второе число
+     * @return true, если числа соответствуют
+     */
+    private static boolean isValidFormatNumbers(int a, int b) {
+        return a >= 1 && b >= 1 && a <= 10 && b <= 10;
     }
 }

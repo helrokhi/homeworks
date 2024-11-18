@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 public class AppTest {
     @Test
     public void testCalc1() throws InvalidFormatException {
-        String input = "1+2";
-        String actual = "3";
-        String expected = App.calc(input);
+        String input = "1 + 2";
+        int actual = 3;
+        int expected = App.resultOfArithmeticOperation(input);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -16,20 +16,20 @@ public class AppTest {
     public void testCalc2() {
         String input = "1";
         Assertions.assertThrows(
-                InvalidFormatException.class, () -> App.calc(input));
+                InvalidFormatException.class, () -> App.resultOfArithmeticOperation(input));
     }
 
     @Test
     public void testCalc3() {
-        String input = "1+21";
+        String input = "1 + 2 1";
         Assertions.assertThrows(
-                InvalidFormatException.class, () -> App.calc(input));
+                InvalidFormatException.class, () -> App.resultOfArithmeticOperation(input));
     }
 
     @Test
     public void testCalc4() {
-        String input = "1+2+3";
+        String input = "1 + 2 + 3";
         Assertions.assertThrows(
-                InvalidFormatException.class, () -> App.calc(input));
+                InvalidFormatException.class, () -> App.resultOfArithmeticOperation(input));
     }
 }
